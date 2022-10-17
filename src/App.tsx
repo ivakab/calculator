@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 
 const numbersList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
@@ -6,27 +6,19 @@ const operators = {
   "+": "plus",
   "-": "minus",
 };
-let result = 0;
+
 function App() {
-  const [firstValue, setFirstValue] = React.useState("");
+  const [firstValue, setFirstValue] = React.useState("0");
   const [secondValue, setSecondValue] = React.useState("0");
   const [inputValue, setInputValue] = React.useState(firstValue);
   const [inputOperator, setOperator] = React.useState("0");
 
   const onOperatorHandler = (operator: string) => {
-    let num = +inputValue;
-    let str = num.toString();
-    setFirstValue(str);
-    switch (operator) {
-      case "plus":
-        setOperator("+");
-        break;
-      case "minus":
-        setOperator("-");
-        break;
-      default:
-        break;
-    }
+    setFirstValue(inputValue);
+
+    setOperator(operator);
+
+    setInputValue("");
   };
 
   const count = () => {
@@ -40,40 +32,44 @@ function App() {
     <div className="App">
       <div className="calculator">
         <input value={inputValue} />
-        <div className="numbers">
-          {numbersList.map((item) => (
+        <div className="allBtns">
+          <div className="numbers">
+            {numbersList.map((item) => (
+              <button
+                className="btn"
+                key={item}
+                onClick={() => {
+                  if (inputValue === "0") {
+                    setInputValue(`${item}`);
+                  } else setInputValue(inputValue + item);
+                }}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+          {Object.entries(operators).map(([key, value]) => (
             <button
-              key={item}
+              className="operators"
+              key={value}
               onClick={() => {
-                setInputValue(inputValue + item);
+                onOperatorHandler(key);
               }}
             >
-              {item}
+              {key}
             </button>
           ))}
-        </div>
-        {Object.entries(operators).map(([key, value]) => (
+
           <button
-            key={value}
+            className="operators"
             onClick={() => {
-              onOperatorHandler(value);
-              setInputValue("");
+              setInputValue(`${count()}`);
             }}
           >
-            {key}
+            =
           </button>
-        ))}
+        </div>
       </div>
-      <button
-        onClick={() => {
-          result = count();
-          setInputValue("");
-        }}
-      >
-        =
-      </button>
-
-      <div>{result}</div>
     </div>
   );
 }
