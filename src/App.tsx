@@ -3,17 +3,22 @@ import "./App.css";
 
 const numbersList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
 const operators = {
-  "+": "plus",
-  "-": "minus",
+  // "+": "plus",
+  // "-": "minus",
+  "+": (a: number, b: number) => a + b,
+  "-": (a: number, b: number) => a - b,
 };
 
+type OperatorType = keyof typeof operators;
 function App() {
   const [firstValue, setFirstValue] = React.useState("0");
   const [secondValue, setSecondValue] = React.useState("0");
   const [inputValue, setInputValue] = React.useState(firstValue);
-  const [inputOperator, setOperator] = React.useState("0");
+  const [inputOperator, setOperator] = React.useState<OperatorType | null>(
+    null
+  );
 
-  const onOperatorHandler = (operator: string) => {
+  const onOperatorHandler = (operator: OperatorType) => {
     setFirstValue(inputValue);
 
     setOperator(operator);
@@ -22,16 +27,22 @@ function App() {
   };
 
   const count = () => {
+    if (!inputOperator) {
+      return;
+    }
     let a = +inputValue;
     let b = +firstValue;
-    if (inputOperator == "+") return b + a;
-    else return b - a;
+    return operators[inputOperator](b, a);
+    // if (inputOperator === "+") return b + a;
+    // else return b - a;
   };
 
   return (
     <div className="App">
       <div className="calculator">
-        <input value={inputValue} />
+        <div className="input">
+          <input value={inputValue} />
+        </div>
         <div className="allBtns">
           <div className="numbers">
             {numbersList.map((item) => (
@@ -48,26 +59,29 @@ function App() {
               </button>
             ))}
           </div>
-          {Object.entries(operators).map(([key, value]) => (
+          <div className="actions">
+            {Object.entries(operators).map(([key, value]) => (
+              <button
+                className="operators"
+                key={key}
+                onClick={() => {
+                  // @ts-ignore
+                  onOperatorHandler(key);
+                }}
+              >
+                {key}
+              </button>
+            ))}
+
             <button
               className="operators"
-              key={value}
               onClick={() => {
-                onOperatorHandler(key);
+                setInputValue(`${count()}`);
               }}
             >
-              {key}
+              =
             </button>
-          ))}
-
-          <button
-            className="operators"
-            onClick={() => {
-              setInputValue(`${count()}`);
-            }}
-          >
-            =
-          </button>
+          </div>
         </div>
       </div>
     </div>
